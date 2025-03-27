@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blind Ranking Osler Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            color: #333;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: scale(1.02);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        .description {
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #555;
+        }
+        .beverage p {
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 20px;
+        }
+        .beverage button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        .beverage button:hover {
+            background-color: #45a049;
+        }
+        .beverage button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .rankings {
+            margin-top: 40px;
+        }
+        .ranking-list {
+            list-style-type: none;
+            padding: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .ranking-list li {
+            margin: 10px 0;
+            font-weight: bold;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .ranking-list li:hover {
+            background-color: #e0e0e0;
+        }
+        .start-btn {
+            margin-top: 30px;
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #FF6F61;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .start-btn:hover {
+            background-color: #e05c4c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="nameContainer">
+    <h1>Blind Ranking: Osler SARs</h1>
+    <p class="description">Blindly rank from 1 (Most) to 5 (Least) the SARs who you would most trust to cut your hair, without knowing who comes next. Choose Wisely!</p>
+    <input type="text" id="playerName" placeholder="Your name" />
+    <button class="start-btn" onclick="startGame()">Start</button>
+</div>
+
+<div class="container" id="gameContainer" style="display: none;">
+    <h1>Blind Ranking: Osler SARs</h1>
+    <p class="description">Blindly rank from 1 (Most) to 5 (Least) the SARs who you would most trust to cut your hair, without knowing who comes next. Choose Wisely!</p>
+    <h2 id="displayName"></h2>
+    <div id="beverageContainer" class="beverage">
+        <p id="beverageName">Eli Morris</p>
+        <button id="rank1" onclick="rank(1)">1</button>
+        <button id="rank2" onclick="rank(2)">2</button>
+        <button id="rank3" onclick="rank(3)">3</button>
+        <button id="rank4" onclick="rank(4)">4</button>
+        <button id="rank5" onclick="rank(5)">5</button>
+    </div>
+    <div class="rankings">
+        <h2>Your Rankings:</h2>
+        <ul id="rankingList" class="ranking-list">
+            <li>1: <span id="rank1Result">-</span></li>
+            <li>2: <span id="rank2Result">-</span></li>
+            <li>3: <span id="rank3Result">-</span></li>
+            <li>4: <span id="rank4Result">-</span></li>
+            <li>5: <span id="rank5Result">-</span></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const beverages = ["Eli Morris", "Hamza Patel", "Madison Kahl", "Deen Garba", "Sanjana Verma"];
+    let rankings = [null, null, null, null, null];
+    let currentBeverageIndex = 0;
+    let playerName = "";
+
+    function startGame() {
+        playerName = document.getElementById("playerName").value.trim();
+        if (playerName === "") {
+            alert("Please enter your name before starting.");
+            return;
+        }
+        document.getElementById("nameContainer").style.display = "none";
+        document.getElementById("gameContainer").style.display = "block";
+        document.getElementById("displayName").textContent = `Player: ${playerName}`;
+        updateBeverage();
+    }
+
+    function updateBeverage() {
+        if (currentBeverageIndex < beverages.length) {
+            document.getElementById("beverageName").textContent = beverages[currentBeverageIndex];
+        }
+    }
+
+    function rank(rank) {
+        rankings[rank - 1] = beverages[currentBeverageIndex];
+        document.getElementById(`rank${rank}Result`).textContent = beverages[currentBeverageIndex];
+        document.getElementById(`rank${rank}`).disabled = true;
+        currentBeverageIndex++;
+        if (currentBeverageIndex < beverages.length) {
+            updateBeverage();
+        } else {
+            document.getElementById("beverageContainer").innerHTML = "<p>You've completed the ranking!</p>";
+        }
+    }
+</script>
+
+</body>
+</html>
+
