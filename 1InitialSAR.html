@@ -4,147 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to the Osler Games!</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #002D72, #73B0E4);
-            color: #333;
-            overflow-y: auto ;
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 15px;
-            padding: 40px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            transition: transform 0.3s ease-in-out;
-        }
+        <style>
+            * {
+                box-sizing: border-box;
+            }
 
-        .container:hover {
-            transform: scale(1.02);
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #002D72;
-        }
-        .page-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            width: 100%;
-        }
+            body {
+                font-family: 'Arial', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #002D72, #73B0E4);
+                color: #333;
+                overflow-x: hidden;
+            }
 
-        .main-title {
-            text-align: center;
-            color: white;
-            font-size: 36px;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-        .description {
-            font-size: 16px;
-            margin-bottom: 20px;
-            font-style: italic;
-            color: #555;
-        }
-        .beverage p {
-            font-size: 24px;
-            font-weight: bold;
-            color: black;
-            margin-bottom: 20px;
-        }
-        .beverage button {
-            padding: 12px 20px;
-            font-size: 18px;
-            background-color: #002D72;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background-color 0.3s;
-        }
-        .beverage button:hover {
-            background-color: #73B0E4;
-        }
-        .beverage button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-        .rankings {
-            margin-top: 40px;
-        }
-        .ranking-list {
-            list-style-type: none;
-            padding: 0;
-            font-size: 18px;
-            color: #333;
-        }
-        .ranking-list li {
-            margin: 10px 0;
-            font-weight: bold;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            padding: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .ranking-list li:hover {
-            background-color: #e0e0e0;
-        }
-        .restart-btn, .start-btn {
-            margin-top: 30px;
-            padding: 12px 20px;
-            font-size: 18px;
-            background-color: #002D72;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .restart-btn:hover, .start-btn:hover {
-            background-color: #73B0E4;
-        }
-        .next-game-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background-color: #002D72;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-        }
-        .next-game-btn:hover {
-            background-color: #73B0E4;
-        }
-        .next-game-btn img {
-            margin-left: 8px;
-            width: 20px;
-            height: 20px;
-        }
+            .page-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                width: 100%;
+                padding: 20px;
+            }
 
-        #displayName {
-            color: #002D72; /* Custom color for the player's name */
-            font-weight: bold;
-            font-size: 20px;
-        }
+            .main-title {
+                text-align: center;
+                color: white;
+                font-size: 32px;
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
 
-    </style>
+            .container {
+                position: relative; /* 👈 Add this line */
+                background-color: #ffffff;
+                border-radius: 15px;
+                padding: 30px 20px;
+                width: 100%;
+                max-width: 600px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                transition: transform 0.3s ease-in-out;
+                margin-bottom: 30px;
+            }
+
+            .container:hover {
+                transform: scale(1.02);
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 10px;
+                color: #002D72;
+            }
+
+            .description {
+                font-size: 15px;
+                margin-bottom: 20px;
+                font-style: italic;
+                color: #555;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                font-size: 16px;
+                width: 90%;
+                max-width: 400px;
+                margin-bottom: 15px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+            }
+
+            .beverage p {
+                font-size: 20px;
+                font-weight: bold;
+                color: black;
+                margin-bottom: 20px;
+            }
+
+            .beverage button {
+                padding: 10px 16px;
+                font-size: 16px;
+                background-color: #002D72;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                margin: 5px;
+                transition: background-color 0.3s;
+                width: 60px;
+            }
+
+            .beverage button:hover {
+                background-color: #73B0E4;
+            }
+
+            .beverage button:disabled {
+                background-color: #ddd;
+                cursor: not-allowed;
+            }
+
+            .rankings {
+                margin-top: 30px;
+            }
+
+            .ranking-list {
+                list-style-type: none;
+                padding: 0;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .ranking-list li {
+                margin: 8px 0;
+                font-weight: bold;
+                background-color: #f0f0f0;
+                border-radius: 5px;
+                padding: 10px;
+                transition: background-color 0.3s ease;
+            }
+
+            .ranking-list li:hover {
+                background-color: #e0e0e0;
+            }
+
+            .start-btn,
+            .restart-btn {
+                margin-top: 20px;
+                padding: 12px 20px;
+                font-size: 16px;
+                background-color: #002D72;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                width: 90%;
+                max-width: 300px;
+            }
+
+            .start-btn:hover,
+            .restart-btn:hover {
+                background-color: #73B0E4;
+            }
+
+            .next-game-btn {
+                margin-top: 30px;
+                background-color: #002D72;
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .next-game-btn:hover {
+                background-color: #73B0E4;
+            }
+
+            .next-game-btn img {
+                margin-left: 8px;
+                width: 20px;
+                height: 20px;
+            }
+
+            #displayName {
+                color: #002D72;
+                font-weight: bold;
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            @media (max-width: 480px) {
+                .main-title {
+                    font-size: 26px;
+                }
+
+                .container {
+                    padding: 20px 10px;
+                }
+
+                .beverage p {
+                    font-size: 18px;
+                }
+
+                .beverage button {
+                    font-size: 14px;
+                    padding: 10px;
+                    width: 50px;
+                }
+
+                .ranking-list li {
+                    font-size: 14px;
+                }
+
+                .next-game-btn {
+                    position: relative;
+                    bottom: auto;
+                    right: auto;
+                }
+            }
+        </style>
 </head>
 <body>
     <div class="page-wrapper">
