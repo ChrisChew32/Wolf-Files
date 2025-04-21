@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Build Your Perfect O Call</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #eaf1f8;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 1em;
+      background: linear-gradient(90deg, #002D72, #73B0E4);
+      color: white;
+      margin: 0;
+      font-size: 1.8em;
+    }
+    h2#displayName {
+      text-align: center;
+      font-size: 1.5em;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .main {
+      flex: 2;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar {
+      flex: 1;
+      border-left: 2px solid #cbd5e1;
+      padding: 20px;
+      background: #f0f8ff;
+    }
+
+    .budget {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #007BFF;
+      margin-bottom: 1em;
+    }
+
+    .category {
+      margin-bottom: 2em;
+    }
+
+    .category h2 {
+      margin-bottom: 0.5em;
+      font-size: 1.4em;
+      color: #003366;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .option:hover {
+      background: #e0f0ff;
+      border-color: #007BFF;
+    }
+
+    .option.selected {
+      background: #d6eaff;
+      border-color: #007BFF;
+      font-weight: bold;
+    }
+
+    .summary h3 {
+      margin-bottom: 10px;
+      color: #003366;
+    }
+
+    .summary ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .summary li {
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 2px solid #cbd5e1;
+      }
+    }
+
+    .leaderboard-btn {
+        margin-top: 20px;
+        padding: 12px 20px;
+        font-size: 18px;
+        background-color: #002D72;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .leaderboard-btn:hover {
+        background-color: #73B0E4;
+      }
+
+  </style>
+</head>
+<body>
+
+<h1>Build Your Perfect O Call</h1>
+<h2 id="displayName"></h2>
+
+<div class="container">
+  <div class="main" id="mainContent">
+    <!-- Categories appear here one at a time -->
+  </div>
+  <div class="sidebar">
+    <div class="budget">Budget Left: $<span id="budget">15</span></div>
+    <div class="summary">
+      <h3>Your Picks:</h3>
+      <ul id="selectionList">
+        <!-- Selections show here -->
+      </ul>
+      <button id="leaderboardBtn" class="leaderboard-btn" onclick="nextGame()">See Other's Results</button>
+    </div>
+  </div>
+</div>
+
+<script type = "module">
+
+    // Import the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+        // Add other Firebase products as needed
+        // import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+        // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+          authDomain: "wolf-project-a8881.firebaseapp.com",
+          projectId: "wolf-project-a8881",
+          storageBucket: "wolf-project-a8881.appspot.com",
+          messagingSenderId: "805666502042",
+          appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+          measurementId: "G-HZY0K4JSJH",
+          databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+      };
+
+  // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+  let playerName = localStorage.getItem("playerName");  // Retrieve the player name from localStorage
+  document.getElementById("displayName").textContent = `Player: ${playerName}`;  // Display the player's name
+
+  const totalBudget = 15;
+  let currentBudget = totalBudget;
+  const selectedItems = {};
+  let currentCategoryIndex = 0;
+
+  const categories = [
+    {
+      name: "Workroom",
+      options: [
+        { name: "Slightly sticky keyboards", price: 1 },
+        { name: "Desks cluttered with old PHI", price: 2 },
+        { name: "String lighting", price: 3 },
+        { name: "Every computer has dual monitors", price: 4 },
+        { name: "Fully stocked with Trader Joe's snacks and Celcius", price: 5 },
+      ]
+    },
+    {
+      name: "Admissions",
+      options: [
+        { name: "Fiver and none of your patients know their meds", price: 1 },
+        { name: "4 'fall/syncope workup' admissions", price: 2 },
+        { name: "4 admissions in the specialty of your choice", price: 3 },
+        { name: "Not a single page about old patients and 2 interesting admissions", price: 4 },
+        { name: "No-hitter", price: 5 },
+      ]
+    },
+    {
+      name: "SARs",
+      options: [
+        { name: "SAR messages you at 4:30am to replete phos", price: 1 },
+        { name: "SAR asks you to consult Cardiology at 4am", price: 2 },
+        { name: "SAR lets you to do whatever you want", price: 3 },
+        { name: "Yoo Jin Kim", price: 4 },
+        { name: "Your favorite SAR (unless Yoo Jin is already your favorite)", price: 5 },
+      ]
+    },
+    {
+      name: "Nursing",
+      options: [
+        { name: "2 RRTs called without any heads up", price: 1 },
+        { name: "None of the nurses respond via EpicChat", price: 2 },
+        { name: "Midnight rounds takes over an hour", price: 3 },
+        { name: "Freshly brewed coffee and snacks at Mightnight Rounds", price: 4 },
+        { name: "Night shift crew is all of your favorite nurses", price: 5 },
+      ]
+    },
+    {
+      name: "Wildcard",
+      options: [
+        { name: "You have the flu", price: 1 },
+        { name: "Your phone dies with no charger", price: 2 },
+        { name: "5 patients lose access", price: 3 },
+        { name: "Old Rounds gets pushed back to 8am", price: 4 },
+        { name: "This is your last call before your vacation", price: 5 },
+      ]
+    }
+  ];
+
+  const budgetDisplay = document.getElementById("budget");
+  const selectionList = document.getElementById("selectionList");
+  const mainContent = document.getElementById("mainContent");
+
+  function updateSidebar() {
+    budgetDisplay.textContent = currentBudget.toFixed(2);
+    selectionList.innerHTML = "";
+    for (let [cat, item] of Object.entries(selectedItems)) {
+      const li = document.createElement("li");
+      li.textContent = `${cat}: ${item.name} ($${item.price})`;
+      selectionList.appendChild(li);
+    }
+  }
+
+  function renderCategories() {
+    categories.forEach((category, index) => {
+      const catDiv = document.createElement("div");
+      catDiv.classList.add("category");
+      catDiv.dataset.index = index;
+
+      const catTitle = document.createElement("h2");
+      catTitle.textContent = category.name;
+      catDiv.appendChild(catTitle);
+
+      const optionsDiv = document.createElement("div");
+      optionsDiv.classList.add("options");
+      optionsDiv.style.display = index === 0 ? "flex" : "none";
+
+      category.options.forEach(option => {
+        const optDiv = document.createElement("div");
+        optDiv.classList.add("option");
+        optDiv.textContent = `${option.name} ($${option.price})`;
+
+        optDiv.addEventListener("click", () => {
+          if (selectedItems[category.name]) return;
+
+          if (option.price > currentBudget) {
+            alert("Not enough money for that!");
+            return;
+          }
+
+          optDiv.classList.add("selected");
+          selectedItems[category.name] = option;
+          currentBudget -= option.price;
+          updateSidebar();
+
+          const nextCat = document.querySelector(`.category[data-index="${index + 1}"] .options`);
+              if (nextCat) {
+                nextCat.style.display = "flex";
+              } else {
+                // All categories selected
+                checkCompletionAndSave();
+              }
+
+
+        });
+
+        optionsDiv.appendChild(optDiv);
+      });
+
+      catDiv.appendChild(optionsDiv);
+      mainContent.appendChild(catDiv);
+    });
+  }
+
+  updateSidebar();
+  renderCategories();
+
+  import { get } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js"; // Add 'get' if not already imported
+
+function checkCompletionAndSave() {
+  if (Object.keys(selectedItems).length === categories.length) {
+    const resultData = {
+      name: playerName,
+      meal: selectedItems,
+      budgetLeft: currentBudget,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log("Saving to Firebase:", resultData);
+
+    // Read existing data and prepend the new result
+    get(ref(db, 'game_OCall')).then((snapshot) => {
+      const data = snapshot.val() ?? [];
+
+      set(ref(db, 'game_OCall'), [resultData, ...data])
+        .then(() => {
+          alert("Your meal has been saved! 🍽️");
+        })
+        .catch((error) => {
+          console.error("Error writing to Firebase:", error);
+        });
+    });
+  }
+}
+
+   window.nextGame = function() {
+        // Redirect to a new game (game2.html in this case)
+    window.location.href = "OCallBudgetLeaderboard.html";
+}
+</script>
+
+</body>
+</html>
+
