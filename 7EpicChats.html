@@ -205,7 +205,7 @@
   // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const beverages = ["'Patient has no access, VAT has already tried twice'", "'Can you bring this patient to CT'", "'Ready for Night rounds?'", "'12:55am Notification from Tamara Milner'", "'Patient complaining of pain, refuses Tylenol and lidocaine patch, says they dont work'"];
+    const beverages = ["'Patient has no access, VAT has already tried twice'", "'Can you bring this patient to CT'", "'Patient discharged 4 days ago and is calling back because they can't get their meds, pls call them", "'12:55am Notification from Tamara Milner'", "'Patient complaining of pain, refuses Tylenol and lidocaine patch, says they dont work'"];
     let rankings = [null, null, null, null, null];
     let currentBeverageIndex = 0;
     let playerName = localStorage.getItem("playerName");  // Retrieve the player name from localStorage
