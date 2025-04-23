@@ -194,13 +194,14 @@
     <div class="container">
       <div class="main" id="mainContent"></div>
       <div class="sidebar" id="sidebar">
+        <div id="leaderboardContainer" style="display: none;">
+          <button id="leaderboardBtn" class="leaderboard-btn" onclick="nextGame()">See Other's Results</button>
+        </div>
         <div class="budget">Budget Left: $<span id="budget">15</span></div>
         <div class="summary">
           <h3>Your Picks:</h3>
           <ul id="selectionList"></ul>
         </div>
-        <button id="leaderboardBtn" class="leaderboard-btn" onclick="nextGame()">See Other's Results</button>
-      </div>
     </div>
 
 <script type="module">
@@ -343,28 +344,29 @@
   }
 
   function checkCompletionAndSave() {
-    if (Object.keys(selectedItems).length === categories.length) {
-      const resultData = {
-        name: playerName,
-        meal: selectedItems,
-        budgetLeft: currentBudget,
-        timestamp: new Date().toISOString()
-      };
+      if (Object.keys(selectedItems).length === categories.length) {
+        const resultData = {
+          name: playerName,
+          meal: selectedItems,
+          budgetLeft: currentBudget,
+          timestamp: new Date().toISOString()
+        };
 
-      get(ref(db, 'game_OCall')).then((snapshot) => {
-        const data = snapshot.val() ?? [];
-        set(ref(db, 'game_OCall'), [resultData, ...data])
-          .then(() => {
-            alert("Your picks have been saved!");
-            // Reveal summary on mobile
-            sidebar.classList.add("complete");
-          })
-          .catch((error) => {
-            console.error("Error writing to Firebase:", error);
-          });
-      });
+        get(ref(db, 'game_OCall')).then((snapshot) => {
+          const data = snapshot.val() ?? [];
+          set(ref(db, 'game_OCall'), [resultData, ...data])
+            .then(() => {
+              alert("Your picks have been saved!");
+              sidebar.classList.add("complete");
+              document.getElementById("leaderboardContainer").style.display = "block"; // 👈 Reveal the button
+            })
+            .catch((error) => {
+              console.error("Error writing to Firebase:", error);
+            });
+        });
+      }
     }
-  }
+
 
   window.nextGame = function () {
     window.location.href = "3OCallBudgetLeaderboard.html";
