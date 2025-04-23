@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Final Results</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      color: #333;
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 30px 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #002D72;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 18px;
+      background-color: #002D72;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #73B0E4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Thanks for playing the Osler Games! <br> <br>Want to go back to see the results of each game?</h1>
+    <button class="btn" onclick="goTo('10OCallBudgetLeaderboardEnd.html')">Building your Ideal O Call </button>
+    <button class="btn" onclick="goTo('11RatherLeaderboardEnd.html')"> $10mill vs Snail</button>
+    
+    <button class="btn" onclick="goTo('12DropOneLeaderboardEnd.html')"> One Has to Go</button>
+    <button class="btn" onclick="goTo('13WriteLeaderboardEnd.html')">Compare you co-resident</button>
+  </div>
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>
