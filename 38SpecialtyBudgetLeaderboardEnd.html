@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaderboard</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: white;
+      color: #333;
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #002D72;
+    }
+
+    .entry {
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+
+    .entry h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #002D72;
+    }
+
+    .entry ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .entry li {
+      margin-bottom: 4px;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 16px 28px;
+      font-size: 20px;
+      background-color: #28a745; /* Bright green */
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Leaderboard: Future Attending Self Results</h1>
+    <button class="back-btn" onclick="window.location.href='3MainResults.html'">CLICK HERE FOR ALL RESULTS!</button>
+    <div id="resultsContainer">Loading...</div>
+    
+  </div>
+
+
+
+  <script type="module">
+    // Import the Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+        // Add other Firebase products as needed
+        // import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+        // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+      authDomain: "wolf-project-a8881.firebaseapp.com",
+      projectId: "wolf-project-a8881",
+      storageBucket: "wolf-project-a8881.appspot.com",
+      messagingSenderId: "805666502042",
+      appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+      measurementId: "G-HZY0K4JSJH",
+      databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+    };
+
+// Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+  // Fetch and display results
+    const resultsContainer = document.getElementById("resultsContainer");
+
+    onValue(ref(db, 'game_Specialty'), (snapshot) => {
+       const data = snapshot.val();
+       console.log(data);
+
+       if (!data) {
+        resultsContainer.innerHTML = "<p>No results yet.</p>";
+        return;
+      }
+
+      const entries = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      resultsContainer.innerHTML = "";
+
+      entries.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "entry";
+
+        let mealList = "<li><i>No selections found</i></li>";
+        if (entry.meal && typeof entry.meal === "object") {
+        mealList = Object.entries(entry.meal)
+
+            .map(([category, item]) => {
+              // also make sure item has name and price
+              if (item && item.name && item.price !== undefined) {
+                return `<li>${category}: ${item.name} ($${item.price})</li>`;
+              } else {
+                return `<li>${category}: Incomplete item</li>`;
+              }
+            })
+            .join("");
+        }
+
+        div.innerHTML = `
+          <h3>${entry.name}</h3>
+          <ul>${mealList}</ul>
+          <small>Submitted: ${new Date(entry.timestamp).toLocaleString()}</small>
+        `;
+        resultsContainer.appendChild(div);
+      });
+
+  });
+
+
+</script>
+
+</body>
+</html>

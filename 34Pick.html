@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick One, Drop One Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #002D72, #73B0E4);
+            color: #333;
+            overflow-y: auto;
+        }
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #002D72;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .button {
+            background-color: #002D72;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 15px;
+            border-radius: 10px;
+            width: 45%;
+        }
+
+        .button:hover {
+            background-color: #73B0E4;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 30px;
+        }
+
+        .final-choice {
+            font-size: 32px;
+            font-weight: bold;
+            color: #002D72;
+            margin-top: 30px;
+        }
+
+        .centered-button {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            display: none; 
+        }
+
+         .next-btn {
+            margin-top: 30px;
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #002D72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .next-btn:hover {
+            background-color: #73B0E4;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Keep Picking Your Favorite Until You Have A Winner</h1>
+        <h2 id="displayName"></h2>
+        <div class="button-container">
+            <button class="button" id="item1Button"></button>
+            <button class="button" id="item2Button"></button>
+        </div>
+        <div class="centered-button" id="finalButtonContainer">
+            <button class="button" id="finalButton"></button>
+        </div>
+        <h3>Your current leader: <span id="winner"></span></h3>
+        <div id="finalChoice" class="final-choice"></div>
+        <button class="next-btn" onclick="nextGame()">Click here to see what others put</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+    // Firebase setup (as before)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+        authDomain: "wolf-project-a8881.firebaseapp.com",
+        projectId: "wolf-project-a8881",
+        storageBucket: "wolf-project-a8881.appspot.com",
+        messagingSenderId: "805666502042",
+        appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+        measurementId: "G-HZY0K4JSJH",
+        databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let selectedAnswers = {};
+    let playerName = localStorage.getItem("playerName"); // Retrieve the player name from localStorage
+    document.getElementById("displayName").textContent = `Player: ${playerName}`;  // Display the player's name
+
+
+    const items = [
+        "CCU", "MPC", "The O", "Solids", "Ambo",
+        "Night Watch", "MICU", "Jeopardy", "NATO/DATO", "POLK",
+        "MEG", "CJ", "Leuks", "PCCU"
+    ];
+
+    let currentChampion = null;
+
+    const item1Button = document.getElementById("item1Button");
+    const item2Button = document.getElementById("item2Button");
+    const winnerElement = document.getElementById("winner");
+    const finalChoiceElement = document.getElementById("finalChoice");
+    const finalButtonContainer = document.getElementById("finalButtonContainer");
+    const finalButton = document.getElementById("finalButton");
+
+    window.startGame = function() {
+        const item1 = items.shift();
+        const item2 = items.shift();
+
+        item1Button.innerHTML = item1;
+        item2Button.innerHTML = item2;
+
+        item1Button.onclick = () => chooseWinner(item1, item2, "left");
+        item2Button.onclick = () => chooseWinner(item2, item1, "right");
+    }
+
+    window.chooseWinner = function(winner, loser, side) {
+        winnerElement.innerHTML = winner;
+
+        // Set currentChampion if not already set
+        if (!currentChampion) currentChampion = winner;
+
+        // Remove the loser
+        const loserIndex = items.indexOf(loser);
+        if (loserIndex > -1) {
+            items.splice(loserIndex, 1);
+        }
+
+        // Get next challenger
+        const nextChallenger = items.shift();
+
+
+        // Update currentChampion
+        currentChampion = winner;
+
+        // Keep winner on same side, load nextChallenger on opposite
+        if (side === "left") {
+            item1Button.innerHTML = currentChampion;
+            item2Button.innerHTML = nextChallenger;
+            item1Button.onclick = () => chooseWinner(currentChampion, nextChallenger, "left");
+            item2Button.onclick = () => chooseWinner(nextChallenger, currentChampion, "right");
+        } else {
+            item1Button.innerHTML = nextChallenger;
+            item2Button.innerHTML = currentChampion;
+            item1Button.onclick = () => chooseWinner(nextChallenger, currentChampion, "left");
+            item2Button.onclick = () => chooseWinner(currentChampion, nextChallenger, "right");
+        }
+
+
+        if (!nextChallenger) {
+            document.querySelector("h3").style.display = "none"; 
+            finalChoiceElement.innerHTML = "Game Over! Your final pick was: " + winner;
+            finalButton.innerHTML = winner;
+            item1Button.style.display = "none";
+            item2Button.style.display = "none";
+            finalButtonContainer.style.display = "flex";
+
+            const resultData = {
+            name: playerName,
+            finalPick: winner,
+            timestamp: new Date().toISOString()
+        };
+
+            onValue(ref(db, 'game_pick2'), (snapshot) => {
+            const data = snapshot.val() ?? []; // Get existing data
+            console.log(data);
+
+            // Add the new result
+            set(ref(db, "game_pick2"), [resultData, ...data])
+            .then(() => {
+                console.log("Data successfully written to Firebase!");
+            })
+            .catch(error => {
+                console.log("Error writing to Firebase:", error);
+            });
+        }, { onlyOnce: true });
+
+            return;
+
+        }
+        // Push data to Firebase
+        
+    }
+
+     window.nextGame = function() {
+        window.location.href = "35PickLeaderboard.html"; // Change this to your next game file
+    }
+
+
+    startGame();
+</script>
+</body>
+</html>
+
+

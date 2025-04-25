@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaderboard - Pick One, Drop One</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      margin: 0;
+      padding: 0;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .leaderboard-container {
+      background: #fff;
+      border-radius: 15px;
+      padding: 40px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #002D72;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #002D72;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 16px 28px;
+      font-size: 20px;
+      background-color: #28a745; /* Bright green */
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+    }
+  </style>
+</head>
+<body>
+  <div class="leaderboard-container">
+    <h1>Leaderboard</h1>
+    <button class="back-btn" onclick="window.location.href='3MainResults.html'">CLICK HERE FOR ALL RESULTS!</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Final Pick</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody">
+        <!-- Firebase data will populate here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+      authDomain: "wolf-project-a8881.firebaseapp.com",
+      projectId: "wolf-project-a8881",
+      storageBucket: "wolf-project-a8881.appspot.com",
+      messagingSenderId: "805666502042",
+      appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+      measurementId: "G-HZY0K4JSJH",
+      databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const leaderboardBody = document.getElementById("leaderboardBody");
+
+    onValue(ref(db, "game_pick2"), (snapshot) => {
+      const data = snapshot.val() ?? [];
+
+      // Ensure data is sorted by timestamp descending
+      const sorted = [...data].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      leaderboardBody.innerHTML = ""; // Clear previous rows
+
+      sorted.forEach(entry => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${entry.name}</td>
+          <td>${entry.finalPick}</td>
+          <td>${new Date(entry.timestamp).toLocaleString()}</td>
+        `;
+
+        leaderboardBody.appendChild(row);
+      });
+    });
+
+  </script>
+</body>
+</html>
