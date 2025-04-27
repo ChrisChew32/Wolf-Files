@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Write in your answer!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      color: #333;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+      max-width: 800px;
+    }
+    h1 {
+      color: #002D72;
+      text-align: center;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .question {
+      font-size: 20px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .input-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    #answerInput {
+      width: 80%;
+      max-width: 500px;
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+      min-height: 180px;
+    }
+
+    .next-btn {
+      padding: 12px;
+      font-size: 18px;
+      background-color: #002D72;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      align-self: center;
+    }
+    .next-btn:hover {
+      background-color: #73B0E4;
+    }
+
+    .skip-btn {
+      padding: 12px;
+      font-size: 18px;
+      background-color: #002D72;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      align-self: center;
+      margin-top: 10px;
+    }
+    .skip-btn:hover {
+      background-color: #73B0E4;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the Osler Games!</h1>
+    <h2 id="displayName"></h2>
+
+    <div class="question">
+      Which top 5 meds are you drafting to you championship team and why?<br><br>(Whoever gets the most likes wins $5)
+      <div class="input-wrapper">
+        <textarea
+          id="answerInput"
+          placeholder="Type your answer here..."
+          rows="6">
+1. 
+2. 
+3. 
+4. 
+5. </textarea>
+      </div>
+    </div>
+
+    <button class="next-btn" onclick="submitAndGo()">Submit</button>
+        <button class="skip-btn" onclick="skipToLeaderboard()">Skip ahead to see others' responses</button>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+      authDomain: "wolf-project-a8881.firebaseapp.com",
+      projectId: "wolf-project-a8881",
+      storageBucket: "wolf-project-a8881.appspot.com",
+      messagingSenderId: "805666502042",
+      appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+      measurementId: "G-HZY0K4JSJH",
+      databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const playerName = localStorage.getItem("playerName") || "Anonymous";
+    document.getElementById("displayName").textContent = `Player: ${playerName}`;
+
+    window.submitAndGo = function () {
+        const input = document.getElementById("answerInput");
+        const typedAnswer = input.value.trim();
+
+        if (!typedAnswer) {
+          alert("Please write an answer before continuing.");
+          return;
+        }
+
+        const resultData = {
+          name: playerName,
+          answers: { Q1: typedAnswer },
+          timestamp: new Date().toISOString()
+        };
+
+        onValue(ref(db, 'game_draft5'), (snapshot) => {
+          const data = snapshot.val() ?? [];
+          set(ref(db, "game_draft5"), [resultData, ...data])
+            .then(() => {
+              window.location.href = "53WriteDraftLeaderboard.html";
+            })
+            .catch((error) => {
+              console.error("Error writing to Firebase:", error);
+            });
+        }, { onlyOnce: true });
+      }
+
+      window.skipToLeaderboard = function () {
+        window.location.href = "53WriteDraftLeaderboard.html";
+      }
+
+
+  </script>
+</body>
+</html>
+
