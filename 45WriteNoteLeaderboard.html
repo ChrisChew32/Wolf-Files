@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaderboard</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: white;
+      color: #333;
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #002D72;
+      font-size: 2rem;
+    }
+
+    .entry {
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+
+    .entry h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #002D72;
+    }
+
+    .entry ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .entry li {
+      margin-bottom: 4px;
+    }
+
+    .entry-answer {
+      margin-bottom: 15px;
+      color: #555;
+      font-size: 16px;
+    }
+
+    .entry-time {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .entry-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 2px;
+      color: #002D72;
+      display: block;
+    }
+
+    .like-btn {
+      background-color: #73B0E4;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .like-btn.liked {
+      background-color: #002D72;
+    }
+
+    .like-btn:hover {
+      background-color: #002D72;
+    }
+
+    .like-count {
+      margin-left: 10px;
+      font-size: 16px;
+      color: #002D72;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 16px 28px;
+      font-size: 20px;
+      background-color: #28a745; /* Bright green */
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .entry {
+        padding: 10px;
+      }
+
+      .entry-name {
+        font-size: 16px;
+      }
+
+      .entry-answer {
+        font-size: 14px;
+      }
+
+      .entry-time {
+        font-size: 12px;
+      }
+
+      .back-btn {
+        bottom: 10px;
+        right: 20px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Leaderboard: Blind Ranking Results</h1>
+    <button class="back-btn" onclick="window.location.href='46WriteGoodDay.html'">MOVE ONTO NEXT GAME!</button>
+    <div id="resultsContainer">Loading...</div>
+    <button class="back-btn" onclick="window.location.href='46WriteGoodDay.html'">MOVE ONTO NEXT GAME!</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsO3sEkZwtssoMJ2JaddjaY29lQ4O1yuo",
+      authDomain: "wolf-project-a8881.firebaseapp.com",
+      projectId: "wolf-project-a8881",
+      storageBucket: "wolf-project-a8881.appspot.com",
+      messagingSenderId: "805666502042",
+      appId: "1:805666502042:web:7cebdfcdabf2ea8a857623",
+      measurementId: "G-HZY0K4JSJH",
+      databaseURL: "https://wolf-project-a8881-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const leaderboardDiv = document.getElementById("resultsContainer");
+
+    let firebaseData = [];
+
+    onValue(ref(db, "game_Note4"), (snapshot) => {
+      const rawData = snapshot.val() ?? [];
+
+      // Save firebase data with index so we can reference it after sorting
+      firebaseData = rawData.map((entry, i) => ({
+        ...entry,
+        firebaseIndex: i
+      }));
+
+      // Sort newest first
+      const sortedData = [...firebaseData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      leaderboardDiv.innerHTML = sortedData.map(entry => {
+        const hasLiked = localStorage.getItem(`liked-${entry.timestamp}`) === 'true';
+        return `
+          <div class="entry">
+            <span class="entry-name">${entry.name}</span><br/>
+            <div class="entry-answer">${entry.answers?.Q1 || ''}</div>
+            <div class="entry-time">Submitted: ${new Date(entry.timestamp).toLocaleString()}</div>
+            <button class="like-btn ${hasLiked ? 'liked' : ''}" id="likeBtn${entry.timestamp}" onclick="likeEntry('${entry.timestamp}', ${entry.firebaseIndex}, ${entry.likes || 0})">
+              ${hasLiked ? 'Liked' : 'Like'}
+            </button>
+            <span class="like-count" id="likeCount${entry.timestamp}">${entry.likes || 0} Likes</span>
+          </div>
+        `;
+      }).join('');
+    });
+
+    window.likeEntry = function(timestamp, firebaseIndex, currentLikes) {
+      if (localStorage.getItem(`liked-${timestamp}`)) {
+        return;
+      }
+
+      localStorage.setItem(`liked-${timestamp}`, 'true');
+
+      const entryRef = ref(db, `game_write/${firebaseIndex}`);
+      const likeButton = document.getElementById(`likeBtn${timestamp}`);
+
+      update(entryRef, {
+        likes: currentLikes + 1
+      }).then(() => {
+        likeButton.classList.add('liked');
+        likeButton.innerText = 'Liked';
+        document.getElementById(`likeCount${timestamp}`).innerText = `${currentLikes + 1} Likes`;
+      }).catch((error) => {
+        console.error("Error updating like count:", error);
+      });
+    };
+  </script>
+</body>
+</html>
+
+
+
