@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Play Anonymously</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #002D72, #73B0E4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h1 {
+      color: #002D72;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #002D72;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #73B0E4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the Osler Games Part 6!</h1>
+    <p> Let's have a good night</p>
+    <button onclick="startGame()">Play Anonymously</button>
+  </div>
+
+  <script>
+    function startGame() {
+      // Set name as "Anonymous"
+      localStorage.setItem("playerName", "Anonymous");
+
+      // Redirect to the main game page
+      window.location.href = "62WriteACS.html"; // ← change this if needed
+    }
+  </script>
+</body>
+</html>
+
